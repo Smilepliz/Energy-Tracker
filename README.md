@@ -1,73 +1,46 @@
-# React + TypeScript + Vite
+# Энергоучёт
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Одностраничное приложение для учёта домашних электроприборов: расчёт потребления за день/неделю/месяц и аналитика (топ-5 приборов, графики, сравнение периодов). Данные хранятся в браузере (localStorage).
 
-Currently, two official plugins are available:
+**Стек:** React 18, TypeScript, Vite, Ant Design, @ant-design/plots, React Router v6.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Как открыть приложение
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Локально (разработка)
 
-## Expanding the ESLint configuration
+1. Установите зависимости:
+   ```bash
+   npm install
+   ```
+2. Запустите сервер разработки:
+   ```bash
+   npm run dev
+   ```
+3. Откройте в браузере адрес, который покажет Vite (обычно **http://localhost:5173**). Для корректной работы маршрутов перейдите по ссылке с базовым путём: **http://localhost:5173/Energy-Tracker/**.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Сборка и предпросмотр
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Собрать проект: `npm run build`
+- Посмотреть сборку локально: `npm run preview` — затем открыть указанный URL (часто http://localhost:4173).
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Опубликованная версия
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Приложение развёрнуто на GitHub Pages:
+
+**https://Smilepliz.github.io/Energy-Tracker/**
+
+Откройте эту ссылку в браузере — приложение работает без установки.
+
+---
+
+## Деплой на GitHub Pages
+
+После изменений в коде можно обновить сайт:
+
+```bash
+npm run deploy
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Скрипт соберёт проект и отправит содержимое папки `dist` в ветку `gh-pages`. В настройках репозитория (Settings → Pages) должен быть выбран источник: ветка **gh-pages**, папка **/ (root)**.
