@@ -1,5 +1,7 @@
 # Энергоучёт
 
+**Открыть приложение:** [https://Smilepliz.github.io/Energy-Tracker/](https://Smilepliz.github.io/Energy-Tracker/)
+
 Одностраничное приложение для учёта домашних электроприборов: расчёт потребления за день/неделю/месяц и аналитика (топ-5 приборов, графики, сравнение периодов). Данные хранятся в браузере (localStorage).
 
 **Стек:** React 18, TypeScript, Vite, Ant Design, @ant-design/plots, React Router v6.
@@ -27,11 +29,7 @@
 
 ### Опубликованная версия
 
-Приложение развёрнуто на GitHub Pages:
-
-**https://Smilepliz.github.io/Energy-Tracker/**
-
-Откройте эту ссылку в браузере — приложение работает без установки.
+Приложение развёрнуто на GitHub Pages — та же ссылка, что и вверху: [https://Smilepliz.github.io/Energy-Tracker/](https://Smilepliz.github.io/Energy-Tracker/). Работает без установки.
 
 ---
 
