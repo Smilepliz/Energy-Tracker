@@ -1,1 +1,15 @@
 /* Layout and app-specific overrides for Ant Design */
+
+/* Секция статистики: Space и карточки на всю ширину */
+.stats-space-fill {
+  display: flex !important;
+  width: 100%;
+}
+.stats-space-fill .ant-space-item {
+  flex: 1;
+  min-width: 140px;
+}
+.stats-space-fill .ant-space-item > * {
+  width: 100%;
+  height: 100%;
+}

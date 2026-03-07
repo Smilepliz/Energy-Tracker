@@ -120,14 +120,14 @@ export default function AppliancesPage() {
         style={{ marginBottom: 24 }}
       />
 
-      <Space size="large" wrap>
-        <Card>
+      <Space size="large" wrap className="stats-space-fill" style={{ width: '100%' }}>
+        <Card style={{ flex: 1, minWidth: 140 }}>
           <Statistic title="За день (кВт·ч)" value={dayKwh.toFixed(2)} />
         </Card>
-        <Card>
+        <Card style={{ flex: 1, minWidth: 140 }}>
           <Statistic title="За неделю (кВт·ч)" value={weekKwh.toFixed(2)} />
         </Card>
-        <Card>
+        <Card style={{ flex: 1, minWidth: 140 }}>
           <Statistic title="За месяц (кВт·ч)" value={monthKwh.toFixed(2)} />
         </Card>
       </Space>
