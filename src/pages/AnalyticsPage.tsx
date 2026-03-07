@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Card, Tabs, DatePicker, Button, Space, Statistic } from 'antd';
+import { Card, Tabs, DatePicker, Button, Space, Statistic, Typography } from 'antd';
 import { Bar, Column } from '@ant-design/plots';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -8,7 +8,9 @@ import {
   totalDailyKwh,
   monthlyConsumptionKwh,
   consumptionForDays,
+  kwhToRub,
 } from '../utils/calculations';
+import { useTariff } from '../hooks/useTariff';
 
 const { RangePicker } = DatePicker;
 
@@ -18,6 +20,7 @@ function getDaysInMonth(year: number, month: number): number {
 
 export default function AnalyticsPage() {
   const { appliances } = useAppliances();
+  const { tariff } = useTariff();
   const [period1, setPeriod1] = useState<[Dayjs, Dayjs] | null>(null);
   const [period2, setPeriod2] = useState<[Dayjs, Dayjs] | null>(null);
   const [compared, setCompared] = useState(false);
@@ -112,6 +115,14 @@ export default function AnalyticsPage() {
             label: 'Обзор',
             children: (
               <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                <Card>
+                  <Typography.Text type="secondary">
+                    За месяц при текущем тарифе ({tariff} ₽/кВт·ч):{' '}
+                  </Typography.Text>
+                  <Typography.Text strong>
+                    ≈ {kwhToRub(dayKwh * 30, tariff).toFixed(2)} ₽
+                  </Typography.Text>
+                </Card>
                 <Card title="Топ-5 приборов по потреблению за месяц">
                   {top5Data.length > 0 ? (
                     <div style={{ height: 300 }}>
@@ -163,7 +174,7 @@ export default function AnalyticsPage() {
                 {comparisonResult && (
                   <>
                     <Card>
-                      <Space size="large">
+                      <Space size="large" wrap>
                         <Statistic title="Период 1 (кВт·ч)" value={comparisonResult.kwh1.toFixed(2)} />
                         <Statistic title="Период 2 (кВт·ч)" value={comparisonResult.kwh2.toFixed(2)} />
                         <Statistic
@@ -176,6 +187,24 @@ export default function AnalyticsPage() {
                           value={comparisonResult.percent.toFixed(1)}
                           suffix="%"
                           valueStyle={{ color: comparisonResult.percent >= 0 ? '#cf1322' : '#3f8600' }}
+                        />
+                      </Space>
+                      <Space size="large" wrap style={{ marginTop: 16 }}>
+                        <Statistic
+                          title="Период 1 (₽)"
+                          value={kwhToRub(comparisonResult.kwh1, tariff).toFixed(2)}
+                          suffix="₽"
+                        />
+                        <Statistic
+                          title="Период 2 (₽)"
+                          value={kwhToRub(comparisonResult.kwh2, tariff).toFixed(2)}
+                          suffix="₽"
+                        />
+                        <Statistic
+                          title="Разница (₽)"
+                          value={kwhToRub(comparisonResult.diff, tariff).toFixed(2)}
+                          suffix="₽"
+                          valueStyle={{ color: comparisonResult.diff >= 0 ? '#cf1322' : '#3f8600' }}
                         />
                       </Space>
                     </Card>

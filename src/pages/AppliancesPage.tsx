@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { Button, Table, Modal, Form, Input, InputNumber, Space, Card, Statistic } from 'antd';
+import { Button, Table, Modal, Form, Input, InputNumber, Select, Space, Card, Statistic, Typography } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { Appliance } from '../types/appliance';
 import { useAppliances } from '../hooks/useAppliances';
+import { APPLIANCES_CATALOG } from '../data/appliancesCatalog';
 import {
   totalDailyKwh,
   totalWeeklyKwh,
   totalMonthlyKwh,
   monthlyConsumptionKwh,
+  kwhToRub,
 } from '../utils/calculations';
+import { useTariff } from '../hooks/useTariff';
 
 type FormValues = {
   name: string;
@@ -26,6 +29,7 @@ const initialForm: FormValues = {
 
 export default function AppliancesPage() {
   const { appliances, addAppliance, updateAppliance, removeAppliance, resetToDemo } = useAppliances();
+  const { tariff, setTariff } = useTariff();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form] = Form.useForm<FormValues>();
@@ -64,6 +68,9 @@ export default function AppliancesPage() {
   const dayKwh = totalDailyKwh(appliances);
   const weekKwh = totalWeeklyKwh(appliances);
   const monthKwh = totalMonthlyKwh(appliances);
+  const dayRub = kwhToRub(dayKwh, tariff);
+  const weekRub = kwhToRub(weekKwh, tariff);
+  const monthRub = kwhToRub(monthKwh, tariff);
 
   const columns = [
     { title: 'Название', dataIndex: 'name', key: 'name' },
@@ -71,10 +78,17 @@ export default function AppliancesPage() {
     { title: 'Количество (шт)', dataIndex: 'count', key: 'count', width: 120 },
     { title: 'Часов в день', dataIndex: 'hoursPerDay', key: 'hoursPerDay', width: 120 },
     {
-      title: 'Потребление за месяц (кВт·ч)',
-      key: 'monthly',
-      width: 200,
+      title: 'За месяц (кВт·ч)',
+      key: 'monthlyKwh',
+      width: 140,
       render: (_: unknown, record: Appliance) => monthlyConsumptionKwh(record).toFixed(2),
+    },
+    {
+      title: 'За месяц (₽)',
+      key: 'monthlyRub',
+      width: 120,
+      render: (_: unknown, record: Appliance) =>
+        kwhToRub(monthlyConsumptionKwh(record), tariff).toFixed(2),
     },
     {
       title: 'Действия',
@@ -103,13 +117,22 @@ export default function AppliancesPage() {
     <>
       <h1 style={{ marginBottom: 24 }}>Мои электроприборы</h1>
 
-      <Space style={{ marginBottom: 16 }}>
+      <Space style={{ marginBottom: 16 }} wrap>
         <Button type="primary" icon={<PlusOutlined />} onClick={openAdd}>
           Добавить прибор
         </Button>
         <Button icon={<ReloadOutlined />} onClick={resetToDemo}>
           Сбросить всё
         </Button>
+        <Typography.Text>Тариф: </Typography.Text>
+        <InputNumber
+          min={0}
+          step={0.1}
+          value={tariff}
+          onChange={(v) => setTariff(v ?? 0)}
+          addonAfter="₽/кВт·ч"
+          style={{ width: 140 }}
+        />
       </Space>
 
       <Table
@@ -121,14 +144,17 @@ export default function AppliancesPage() {
       />
 
       <Space size="large" wrap className="stats-space-fill" style={{ width: '100%' }}>
-        <Card style={{ flex: 1, minWidth: 140 }}>
+        <Card style={{ flex: 1, minWidth: 160 }}>
           <Statistic title="За день (кВт·ч)" value={dayKwh.toFixed(2)} />
+          <Typography.Text type="secondary">≈ {dayRub.toFixed(2)} ₽</Typography.Text>
         </Card>
-        <Card style={{ flex: 1, minWidth: 140 }}>
+        <Card style={{ flex: 1, minWidth: 160 }}>
           <Statistic title="За неделю (кВт·ч)" value={weekKwh.toFixed(2)} />
+          <Typography.Text type="secondary">≈ {weekRub.toFixed(2)} ₽</Typography.Text>
         </Card>
-        <Card style={{ flex: 1, minWidth: 140 }}>
+        <Card style={{ flex: 1, minWidth: 160 }}>
           <Statistic title="За месяц (кВт·ч)" value={monthKwh.toFixed(2)} />
+          <Typography.Text type="secondary">≈ {monthRub.toFixed(2)} ₽</Typography.Text>
         </Card>
       </Space>
 
@@ -142,12 +168,31 @@ export default function AppliancesPage() {
         destroyOnClose
       >
         <Form form={form} layout="vertical" preserve={false}>
+          <Form.Item label="Выбрать из каталога">
+            <Select
+              placeholder="Найти устройство по названию..."
+              showSearch
+              allowClear
+              optionFilterProp="label"
+              options={APPLIANCES_CATALOG.map((d) => ({
+                value: d.name,
+                label: `${d.name} — ${d.power} Вт`,
+              }))}
+              onChange={(value) => {
+                const device = APPLIANCES_CATALOG.find((d) => d.name === value);
+                if (device) {
+                  form.setFieldsValue({ name: device.name, powerW: device.power });
+                }
+              }}
+              style={{ width: '100%' }}
+            />
+          </Form.Item>
           <Form.Item
             name="name"
             label="Название"
             rules={[{ required: true, message: 'Введите название' }]}
           >
-            <Input placeholder="Например: Холодильник" />
+            <Input placeholder="Например: Холодильник или выберите выше" />
           </Form.Item>
           <Form.Item
             name="powerW"

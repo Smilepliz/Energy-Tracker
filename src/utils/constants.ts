@@ -1,6 +1,10 @@
 import type { Appliance } from '../types/appliance';
 
 export const STORAGE_KEY = 'energy-tracker-appliances';
+export const TARIFF_STORAGE_KEY = 'energy-tracker-tariff';
+
+/** Тариф по умолчанию (₽ за 1 кВт·ч) */
+export const DEFAULT_TARIFF_RUB = 5.5;
 
 export const DEMO_APPLIANCES: Appliance[] = [
   { id: 'demo-1', name: 'Холодильник', powerW: 150, count: 1, hoursPerDay: 24 },

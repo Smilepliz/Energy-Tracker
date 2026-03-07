@@ -29,3 +29,8 @@ export function totalMonthlyKwh(appliances: Appliance[]): number {
 export function consumptionForDays(appliance: Appliance, days: number): number {
   return dailyConsumptionKwh(appliance) * days;
 }
+
+/** Стоимость в рублях по потреблению (кВт·ч) и тарифу (₽/кВт·ч) */
+export function kwhToRub(kwh: number, tariffRubPerKwh: number): number {
+  return kwh * tariffRubPerKwh;
+}
