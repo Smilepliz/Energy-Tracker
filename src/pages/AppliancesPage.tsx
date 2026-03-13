@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Button, Table, Modal, Form, Input, InputNumber, Select, Space, Card, Statistic, Typography } from 'antd';
+import { Button, Table, Space, Card, Statistic, Typography, InputNumber } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { Appliance } from '../types/appliance';
 import { useAppliances } from '../hooks/useAppliances';
-import { APPLIANCES_CATALOG } from '../data/appliancesCatalog';
 import {
   totalDailyKwh,
   totalWeeklyKwh,
@@ -12,37 +11,25 @@ import {
   kwhToRub,
 } from '../utils/calculations';
 import { useTariff } from '../hooks/useTariff';
-
-type FormValues = {
-  name: string;
-  powerW: number;
-  count: number;
-  hoursPerDay: number;
-};
-
-const initialForm: FormValues = {
-  name: '',
-  powerW: 100,
-  count: 1,
-  hoursPerDay: 4,
-};
+import ApplianceModal from '../components/ApplianceModal';
+import type { ApplianceModalInitialValues } from '../components/ApplianceModal';
 
 export default function AppliancesPage() {
   const { appliances, addAppliance, updateAppliance, removeAppliance, resetToDemo } = useAppliances();
   const { tariff, setTariff } = useTariff();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form] = Form.useForm<FormValues>();
+  const [modalInitialValues, setModalInitialValues] = useState<ApplianceModalInitialValues | undefined>(undefined);
 
   const openAdd = () => {
     setEditingId(null);
-    form.setFieldsValue(initialForm);
+    setModalInitialValues(undefined);
     setModalOpen(true);
   };
 
   const openEdit = (record: Appliance) => {
     setEditingId(record.id);
-    form.setFieldsValue({
+    setModalInitialValues({
       name: record.name,
       powerW: record.powerW,
       count: record.count,
@@ -51,10 +38,9 @@ export default function AppliancesPage() {
     setModalOpen(true);
   };
 
-  const handleSave = async () => {
-    const values = await form.validateFields();
-    if (editingId) {
-      updateAppliance(editingId, values);
+  const handleSave = (values: { name: string; powerW: number; count: number; hoursPerDay: number }, id?: string | null) => {
+    if (id) {
+      updateAppliance(id, values);
     } else {
       addAppliance(values);
     }
@@ -158,74 +144,14 @@ export default function AppliancesPage() {
         </Card>
       </Space>
 
-      <Modal
-        title={editingId ? 'Редактировать прибор' : 'Добавить прибор'}
-        open={modalOpen}
-        onOk={handleSave}
-        onCancel={() => setModalOpen(false)}
-        okText="Сохранить"
-        cancelText="Отмена"
-        destroyOnClose
-      >
-        <Form form={form} layout="vertical" preserve={false}>
-          <Form.Item label="Выбрать из каталога">
-            <Select
-              placeholder="Найти устройство по названию..."
-              showSearch
-              allowClear
-              optionFilterProp="label"
-              options={APPLIANCES_CATALOG.map((d) => ({
-                value: d.name,
-                label: `${d.name} — ${d.power} Вт`,
-              }))}
-              onChange={(value) => {
-                const device = APPLIANCES_CATALOG.find((d) => d.name === value);
-                if (device) {
-                  form.setFieldsValue({ name: device.name, powerW: device.power });
-                }
-              }}
-              style={{ width: '100%' }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="name"
-            label="Название"
-            rules={[{ required: true, message: 'Введите название' }]}
-          >
-            <Input placeholder="Например: Холодильник или выберите выше" />
-          </Form.Item>
-          <Form.Item
-            name="powerW"
-            label="Мощность (Вт)"
-            rules={[
-              { required: true, message: 'Введите мощность' },
-              { type: 'number', min: 0.01, message: 'Мощность должна быть больше 0' },
-            ]}
-          >
-            <InputNumber min={0.01} step={10} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item
-            name="count"
-            label="Количество (шт)"
-            rules={[
-              { required: true, message: 'Введите количество' },
-              { type: 'integer', min: 1, message: 'Минимум 1' },
-            ]}
-          >
-            <InputNumber min={1} step={1} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item
-            name="hoursPerDay"
-            label="Часов в день"
-            rules={[
-              { required: true, message: 'Введите часы' },
-              { type: 'number', min: 0, max: 24, message: 'От 0 до 24' },
-            ]}
-          >
-            <InputNumber min={0} max={24} step={0.5} style={{ width: '100%' }} />
-          </Form.Item>
-        </Form>
-      </Modal>
+      <ApplianceModal
+        visible={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSave}
+        initialValues={modalInitialValues}
+        editingId={editingId}
+        showCatalogSelect={!editingId}
+      />
     </>
   );
 }

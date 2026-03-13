@@ -1,15 +1,17 @@
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
-import { ThunderboltOutlined, BarChartOutlined } from '@ant-design/icons';
+import { ThunderboltOutlined, BarChartOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import AppliancesPage from './pages/AppliancesPage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import CatalogPage from './pages/CatalogPage';
 import './App.css';
 
 const { Header, Content } = Layout;
 
 function NavMenu() {
   const location = useLocation();
-  const selected = location.pathname === '/analytics' ? ['analytics'] : ['appliances'];
+  const path = location.pathname.replace(/^\//, '') || 'appliances';
+  const selected = path === 'analytics' ? ['analytics'] : path === 'catalog' ? ['catalog'] : ['appliances'];
   return (
     <Menu
       theme="dark"
@@ -19,6 +21,7 @@ function NavMenu() {
       items={[
         { key: 'appliances', icon: <ThunderboltOutlined />, label: <NavLink to="/">Приборы</NavLink> },
         { key: 'analytics', icon: <BarChartOutlined />, label: <NavLink to="/analytics">Аналитика</NavLink> },
+        { key: 'catalog', icon: <UnorderedListOutlined />, label: <NavLink to="/catalog">Каталог</NavLink> },
       ]}
     />
   );
@@ -35,6 +38,7 @@ function App() {
           <Routes>
             <Route path="/" element={<AppliancesPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/catalog" element={<CatalogPage />} />
           </Routes>
         </Content>
       </Layout>
