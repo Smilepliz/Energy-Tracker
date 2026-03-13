@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Modal, Form, Input, InputNumber, Select, Divider } from 'antd';
-import { APPLIANCES_CATALOG } from '../data/appliancesCatalog';
+import { catalogData } from '../data/catalog';
 
 export type ApplianceFormValues = {
   name: string;
@@ -87,21 +87,25 @@ export default function ApplianceModal({
           <>
             <Form.Item
               label="Выбрать из каталога"
-              help="Выберите устройство — название и мощность подставятся автоматически"
+              help="Выберите устройство — название, мощность и часы подставятся из каталога"
             >
               <Select
                 placeholder="Найти устройство по названию..."
                 showSearch
                 allowClear
                 optionFilterProp="label"
-                options={APPLIANCES_CATALOG.map((d) => ({
+                options={catalogData.map((d) => ({
                   value: d.name,
                   label: `${d.name} — ${d.power} Вт`,
                 }))}
                 onChange={(value) => {
-                  const device = APPLIANCES_CATALOG.find((d) => d.name === value);
+                  const device = catalogData.find((d) => d.name === value);
                   if (device) {
-                    form.setFieldsValue({ name: device.name, powerW: device.power });
+                    form.setFieldsValue({
+                      name: device.name,
+                      powerW: device.power,
+                      hoursPerDay: device.typicalHoursPerDay,
+                    });
                   }
                 }}
                 style={{ width: '100%' }}
