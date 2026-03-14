@@ -8,7 +8,10 @@ function loadFromStorage(): Appliance[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
-    return parsed as Appliance[];
+    return (parsed as Appliance[]).map((a) => ({
+      ...a,
+      category: a.category ?? 'other',
+    }));
   } catch {
     return [];
   }

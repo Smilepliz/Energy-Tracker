@@ -30,6 +30,7 @@ export default function AppliancesPage() {
   const openEdit = (record: Appliance) => {
     setEditingId(record.id);
     setModalInitialValues({
+      category: record.category,
       name: record.name,
       powerW: record.powerW,
       count: record.count,
@@ -38,7 +39,7 @@ export default function AppliancesPage() {
     setModalOpen(true);
   };
 
-  const handleSave = (values: { name: string; powerW: number; count: number; hoursPerDay: number }, id?: string | null) => {
+  const handleSave = (values: { category?: string; name: string; powerW: number; count: number; hoursPerDay: number }, id?: string | null) => {
     if (id) {
       updateAppliance(id, values);
     } else {

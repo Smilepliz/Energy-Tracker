@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { Modal, Form, Input, InputNumber, Select, Divider } from 'antd';
-import { catalogData } from '../data/catalog';
+import { Modal, Form, Input, InputNumber, Select } from 'antd';
+import { CATEGORY_LABELS, type CatalogCategoryKey } from '../data/catalog';
 
 export type ApplianceFormValues = {
+  category?: CatalogCategoryKey;
   name: string;
   powerW: number;
   count: number;
@@ -10,6 +11,7 @@ export type ApplianceFormValues = {
 };
 
 export interface ApplianceModalInitialValues {
+  category?: CatalogCategoryKey;
   name?: string;
   powerW?: number;
   count?: number;
@@ -45,6 +47,7 @@ export default function ApplianceModal({
   useEffect(() => {
     if (visible) {
       const values: ApplianceFormValues = {
+        category: initialValues?.category,
         name: initialValues?.name ?? DEFAULT_VALUES.name,
         powerW: initialValues?.powerW ?? DEFAULT_VALUES.powerW,
         count: initialValues?.count ?? DEFAULT_VALUES.count,
@@ -60,14 +63,16 @@ export default function ApplianceModal({
 
   const handleOk = async () => {
     const formValues = await form.validateFields();
+    const category = formValues.category ?? initialValues?.category ?? 'other';
     const values: ApplianceFormValues =
       isEditMode && !editingId
         ? {
             ...formValues,
+            category,
             count: initialValues?.count ?? DEFAULT_VALUES.count,
             hoursPerDay: initialValues?.hoursPerDay ?? DEFAULT_VALUES.hoursPerDay,
           }
-        : formValues;
+        : { ...formValues, category };
     onSave(values, editingId);
     onClose();
   };
@@ -84,35 +89,22 @@ export default function ApplianceModal({
     >
       <Form form={form} layout="vertical" preserve={false}>
         {showCatalogSelect && (
-          <>
-            <Form.Item
-              label="Выбрать из каталога"
-              help="Выберите устройство — название, мощность и часы подставятся из каталога"
-            >
-              <Select
-                placeholder="Найти устройство по названию..."
-                showSearch
-                allowClear
-                optionFilterProp="label"
-                options={catalogData.map((d) => ({
-                  value: d.name,
-                  label: `${d.name} — ${d.power} Вт`,
-                }))}
-                onChange={(value) => {
-                  const device = catalogData.find((d) => d.name === value);
-                  if (device) {
-                    form.setFieldsValue({
-                      name: device.name,
-                      powerW: device.power,
-                      hoursPerDay: device.typicalHoursPerDay,
-                    });
-                  }
-                }}
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-            <Divider plain style={{ margin: '12px 0' }}>Или введите вручную</Divider>
-          </>
+          <Form.Item
+            name="category"
+            label="Выбрать категорию"
+            help="Прибор появится в каталоге и в списке на странице «Приборы»"
+            rules={[{ required: true, message: 'Выберите категорию' }]}
+          >
+            <Select
+              placeholder="Например: Кухня"
+              allowClear={false}
+              options={(Object.entries(CATEGORY_LABELS) as [CatalogCategoryKey, string][]).map(([key, label]) => ({
+                value: key,
+                label,
+              }))}
+              style={{ width: '100%' }}
+            />
+          </Form.Item>
         )}
         <Form.Item
           name="name"
