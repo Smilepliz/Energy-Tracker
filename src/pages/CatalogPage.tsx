@@ -126,7 +126,7 @@ export default function CatalogPage() {
       message.success(`${values.name} добавлен в каталог. В таблицу «Приборы» — по кнопке «Добавить прибор» на карточке.`);
     } else {
       addAppliance({
-        category: values.category,
+        category,
         name: values.name,
         powerW: values.powerW,
         count: values.count ?? 1,

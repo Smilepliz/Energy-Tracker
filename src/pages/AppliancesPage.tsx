@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Table, Space, Card, Statistic, Typography, InputNumber } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { Appliance } from '../types/appliance';
+import type { CatalogCategoryKey } from '../data/catalog';
 import { useAppliances } from '../hooks/useAppliances';
 import {
   totalDailyKwh,
@@ -39,7 +40,7 @@ export default function AppliancesPage() {
     setModalOpen(true);
   };
 
-  const handleSave = (values: { category?: string; name: string; powerW: number; count: number; hoursPerDay: number }, id?: string | null) => {
+  const handleSave = (values: { category?: CatalogCategoryKey; name: string; powerW: number; count: number; hoursPerDay: number }, id?: string | null) => {
     if (id) {
       updateAppliance(id, values);
     } else {
